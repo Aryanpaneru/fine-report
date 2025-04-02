@@ -47,7 +47,7 @@ const SampleDataGenerator = () => {
         // Equity
         ['Capital', '', '500000'],
         ['Retained Earnings', '', '247000'],
-        ['Owner's Drawing', '35000', ''],
+        ["Owner's Drawing", '35000', ''],
         // Income
         ['Sales Revenue', '', '785000'],
         ['Service Revenue', '', '245000'],
