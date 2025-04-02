@@ -7,8 +7,10 @@ import { parseCSVFile } from './csvParser';
 import { parseExcelFile } from './excelParser';
 
 // Re-export types and functions for external use
-export { FileAuditResult, FileParsingIssue, validateFinancialData, processFinancialData } from './types';
+export { FileAuditResult } from './types';
 export type { FileParsingIssue } from './types';
+export { validateFinancialData } from './validator';
+export { processFinancialData } from './processor';
 
 /**
  * Main function to parse financial files of different formats
