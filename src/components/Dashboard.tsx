@@ -122,22 +122,22 @@ const Dashboard = () => {
             
             // Convert to JSON with headers
             const options = { header: 1, defval: "" };
-            const rawData = XLSX.utils.sheet_to_json(worksheet, options);
+            const rawData = XLSX.utils.sheet_to_json(worksheet, options) as unknown[][];
             
             console.log('Raw Excel data:', rawData);
             
             // Process the data to match expected format
-            if (rawData.length < 2) {
+            if (rawData && Array.isArray(rawData) && rawData.length < 2) {
               throw new Error('Excel file does not contain enough data');
             }
             
             // Assuming first row is headers: Particulars, Debit, Credit
-            const headers = rawData[0];
+            const headers = rawData[0] as string[];
             const processedData = [];
             
             for (let i = 1; i < rawData.length; i++) {
-              const row = rawData[i];
-              if (row.length >= 3) {
+              const row = rawData[i] as any[];
+              if (row && Array.isArray(row) && row.length >= 3) {
                 const entry: any = {};
                 for (let j = 0; j < headers.length; j++) {
                   entry[headers[j]] = row[j];
