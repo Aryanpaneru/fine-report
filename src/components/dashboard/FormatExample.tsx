@@ -63,6 +63,7 @@ const FormatExample = () => {
                   <li>CSV, XLSX, XLS, or ODS file formats are supported</li>
                   <li>The file must contain a header row with the column names</li>
                   <li>Required columns are: <code>Particulars</code>, <code>Debit</code>, and <code>Credit</code> (case insensitive)</li>
+                  <li>Column names with trailing spaces (e.g., "Debit " instead of "Debit") will be automatically handled</li>
                   <li>Each row must contain the account name in the Particulars column</li>
                   <li>Each row must have either a Debit or Credit value (or both)</li>
                   <li>Empty rows will be ignored</li>
@@ -91,6 +92,12 @@ const FormatExample = () => {
                     <p className="text-sm text-muted-foreground mt-1">
                       Ensure your file has headers named Particulars, Debit, and Credit (case insensitive).
                       Alternative column names like "Account", "Dr", "Cr" are not automatically recognized.
+                    </p>
+                  </li>
+                  <li>
+                    <strong>Column names with trailing spaces:</strong>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      The system will automatically trim column names like "Debit " to "Debit", but ensure your data is properly aligned.
                     </p>
                   </li>
                   <li>

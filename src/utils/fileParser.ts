@@ -72,8 +72,11 @@ export const parseFinancialFile = (
             }
           }
           
+          // Clean header names by trimming whitespace
+          const cleanedData = normalizeColumnNames(results.data);
+          
           // Validate the parsed data structure
-          const validationResult = validateFinancialData(results.data, audit);
+          const validationResult = validateFinancialData(cleanedData, audit);
           if (!validationResult.valid && audit.validRows === 0) {
             onError(new Error(validationResult.message));
             return;
@@ -156,8 +159,11 @@ export const parseFinancialFile = (
             throw new Error('Excel sheet contains no data rows');
           }
           
+          // Clean header names by trimming whitespace
+          const cleanedData = normalizeColumnNames(jsonData);
+          
           // Validate the parsed data structure
-          const validationResult = validateFinancialData(jsonData, audit);
+          const validationResult = validateFinancialData(cleanedData, audit);
           
           if (!validationResult.valid && audit.validRows === 0) {
             onError(new Error(validationResult.message));
@@ -199,6 +205,21 @@ export const parseFinancialFile = (
     });
     onError(error);
   }
+};
+
+// New helper function to normalize column names by trimming whitespace
+const normalizeColumnNames = (data: any[]): any[] => {
+  if (!data || data.length === 0) return data;
+  
+  return data.map(row => {
+    const newRow: any = {};
+    Object.keys(row).forEach(key => {
+      // Trim whitespace from column names
+      const trimmedKey = key.trim();
+      newRow[trimmedKey] = row[key];
+    });
+    return newRow;
+  });
 };
 
 // Helper function to get suggestions for CSV parsing errors
@@ -276,6 +297,8 @@ export const validateFinancialData = (data: any[], audit?: FileAuditResult): { v
   // Check if the required columns exist in the first row
   const firstRow = data[0];
   const headers = Object.keys(firstRow);
+  
+  console.log('Column headers found:', headers);
   
   // Check for required columns (case-insensitive)
   const normalizedHeaders = headers.map(h => h.toLowerCase());
