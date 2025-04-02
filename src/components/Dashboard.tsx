@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FileUploader from './dashboard/FileUploader';
 import FormatExample from './dashboard/FormatExample';
-import { parseFinancialFile, processFinancialData, validateFinancialData, FileAuditResult, FileParsingIssue } from '@/utils/fileParser';
+import { parseFinancialFile, FileAuditResult, FileParsingIssue } from '@/utils/fileParser';
 
 const Dashboard = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -20,7 +19,6 @@ const Dashboard = () => {
 
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
-    // Clear previous errors and audit when a new file is selected
     setValidationError(null);
     setAuditResult(null);
   };
@@ -50,7 +48,6 @@ const Dashboard = () => {
           if (audit) {
             setAuditResult(audit);
             
-            // Show warning toast if there are issues but we have valid rows
             if (audit.issues.length > 0 && audit.validRows > 0) {
               toast({
                 title: "File Processed with Warnings",
@@ -80,7 +77,6 @@ const Dashboard = () => {
             description: `Successfully processed ${data.length} entries. You can now generate reports.`,
           });
           
-          // Navigate to reports page
           navigate('/reports');
         } catch (error) {
           console.error('Data processing error:', error);
@@ -91,7 +87,6 @@ const Dashboard = () => {
     );
   };
 
-  // Helper function to render issue severity icon
   const renderIssueIcon = (issue: FileParsingIssue) => {
     if (issue.issue.includes('error') || issue.issue.includes('failed') || issue.issue.includes('missing required')) {
       return <AlertCircle className="h-4 w-4 text-destructive" />;
