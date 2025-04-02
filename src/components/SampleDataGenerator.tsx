@@ -2,12 +2,14 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download } from 'lucide-react';
+import { Download, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SampleDataGenerator = () => {
   const [generating, setGenerating] = useState(false);
+  const [format, setFormat] = useState<'xlsx' | 'csv'>('xlsx');
   const { toast } = useToast();
 
   const generateSampleData = () => {
@@ -113,17 +115,36 @@ const SampleDataGenerator = () => {
         ['Heating and Lighting', '22000', '']
       ];
 
-      // Create a workbook and add the data
+      // Create a workbook
       const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Trial Balance');
 
-      // Generate the Excel file and trigger download
-      XLSX.writeFile(workbook, 'sample_trial_balance.xlsx');
+      let fileName = '';
+
+      if (format === 'xlsx') {
+        // Generate Excel file
+        fileName = 'sample_trial_balance.xlsx';
+        XLSX.writeFile(workbook, fileName);
+      } else {
+        // Generate CSV file
+        const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        
+        // Create download link
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        fileName = 'sample_trial_balance.csv';
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
 
       toast({
         title: "Sample Data Generated",
-        description: "A sample trial balance Excel file has been downloaded.",
+        description: `A sample trial balance ${format.toUpperCase()} file has been downloaded.`,
       });
     } catch (error) {
       console.error('Error generating sample data:', error);
@@ -140,16 +161,36 @@ const SampleDataGenerator = () => {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>Sample Data Generator</CardTitle>
+        <CardTitle className="flex items-center">
+          <FileSpreadsheet className="mr-2 h-5 w-5" />
+          Sample Data Generator
+        </CardTitle>
         <CardDescription>
-          Generate a sample Excel file with approximately 100 financial data entries that match the expected format for your application.
+          Generate a sample file with approximately 100 financial data entries that match the expected format.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">
           This will create a sample trial balance with assets, liabilities, equity, income, and expense accounts.
-          The generated Excel file will be immediately downloaded to your device.
+          The generated file will be immediately downloaded to your device.
         </p>
+        
+        <Tabs defaultValue="xlsx" onValueChange={(value) => setFormat(value as 'xlsx' | 'csv')} className="mt-4">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="xlsx">Excel (.xlsx)</TabsTrigger>
+            <TabsTrigger value="csv">CSV</TabsTrigger>
+          </TabsList>
+          <TabsContent value="xlsx">
+            <p className="text-sm text-muted-foreground">
+              Generate an Excel file that can be imported into the application. This format preserves all data types.
+            </p>
+          </TabsContent>
+          <TabsContent value="csv">
+            <p className="text-sm text-muted-foreground">
+              Generate a CSV file that can be imported into the application. This is a plain text format compatible with most spreadsheet applications.
+            </p>
+          </TabsContent>
+        </Tabs>
       </CardContent>
       <CardFooter>
         <Button 
