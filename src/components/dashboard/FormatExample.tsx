@@ -16,6 +16,7 @@ const FormatExample = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="example">Example Data</TabsTrigger>
             <TabsTrigger value="requirements">Requirements</TabsTrigger>
+            <TabsTrigger value="troubleshooting">Troubleshooting</TabsTrigger>
           </TabsList>
           
           <TabsContent value="example">
@@ -76,6 +77,58 @@ const FormatExample = () => {
                   <li><strong>Asset accounts:</strong> Cash, Bank, Stock, Debtors, etc.</li>
                   <li><strong>Liability accounts:</strong> Capital, Loans, Creditors, etc.</li>
                 </ul>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="troubleshooting">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium mb-2">Common Issues:</h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>
+                    <strong>Missing required columns:</strong> 
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Ensure your file has headers named Particulars, Debit, and Credit (case insensitive).
+                      Alternative column names like "Account", "Dr", "Cr" are not automatically recognized.
+                    </p>
+                  </li>
+                  <li>
+                    <strong>Non-numeric values in Debit/Credit columns:</strong>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Ensure all Debit and Credit values are numbers. Remove any currency symbols, commas, or text.
+                    </p>
+                  </li>
+                  <li>
+                    <strong>Merged cells in Excel:</strong>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Merged cells can cause data misalignment. Unmerge all cells before uploading.
+                    </p>
+                  </li>
+                  <li>
+                    <strong>CSV delimiter issues:</strong>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      If using CSV, ensure it uses standard comma delimiter. Some regions use semicolons.
+                    </p>
+                  </li>
+                  <li>
+                    <strong>Hidden data or formulas:</strong>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Convert all formulas to values before uploading. Remove any hidden rows or columns.
+                    </p>
+                  </li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="font-medium mb-2">If You Continue to Have Issues:</h3>
+                <ol className="list-decimal pl-5 space-y-1">
+                  <li>Try exporting your file as a simple CSV format</li>
+                  <li>Ensure the first row contains only the header names</li>
+                  <li>Remove any formatting, colors, or special characters</li>
+                  <li>Check that numeric values don't contain currency symbols or thousand separators</li>
+                  <li>Use our sample data generator to download a correctly formatted template</li>
+                </ol>
               </div>
             </div>
           </TabsContent>
