@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import { AlertCircle, CheckCircle, Download, Upload } from 'lucide-react';
+import { AlertCircle, CheckCircle, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FileUploader from './dashboard/FileUploader';
-import { parseFinancialFile, processFinancialData } from '@/utils/fileParser';
 import * as XLSX from 'xlsx';
 
 const DataCleanup = () => {
@@ -29,38 +28,112 @@ const DataCleanup = () => {
     setIsProcessing(true);
     setError(null);
     
-    parseFinancialFile(
-      file,
-      (data, audit) => {
-        try {
-          if (data.length === 0) {
-            setError('The file does not contain any valid data. Please check the format.');
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      try {
+        const data = event.target?.result;
+        let rawData: any[] = [];
+        
+        // Parse the file based on its type
+        if (file.name.toLowerCase().endsWith('.csv')) {
+          // Parse CSV
+          const text = data as string;
+          const lines = text.split('\n');
+          const headers = lines[0].split(',').map(h => h.trim());
+          
+          if (headers.length !== 3) {
+            setError('The file must contain exactly 3 columns. Please check your file format.');
             setIsProcessing(false);
             return;
           }
           
-          // Process the data to ensure it's in the right format
-          const cleaned = processFinancialData(data);
-          setProcessedData(cleaned);
+          // Process data rows
+          for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue; // Skip empty lines
+            
+            const values = lines[i].split(',').map(v => v.trim());
+            if (values.length !== 3) continue; // Skip malformed rows
+            
+            const row: any = {};
+            headers.forEach((header, index) => {
+              row[header] = values[index];
+            });
+            
+            rawData.push(row);
+          }
+        } else {
+          // Parse Excel
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
           
-          toast({
-            title: "Data Processed Successfully",
-            description: `Processed ${cleaned.length} rows into the standard format.`,
-          });
+          // Check if the file has exactly 3 columns
+          const firstRow = jsonData[0] as any[];
+          if (!firstRow || firstRow.length !== 3) {
+            setError('The file must contain exactly 3 columns. Please check your file format.');
+            setIsProcessing(false);
+            return;
+          }
           
-          setIsProcessing(false);
-        } catch (err: any) {
-          console.error('Data processing error:', err);
-          setError(err.message || 'There was an error processing your data');
-          setIsProcessing(false);
+          const headers = (jsonData[0] as any[]).map(h => String(h).trim());
+          
+          // Process data rows
+          for (let i = 1; i < jsonData.length; i++) {
+            const rowData = jsonData[i] as any[];
+            if (!rowData || rowData.length === 0) continue;
+            
+            if (rowData.length !== 3) continue; // Skip malformed rows
+            
+            const row: any = {};
+            headers.forEach((header, index) => {
+              row[header] = rowData[index];
+            });
+            
+            rawData.push(row);
+          }
         }
-      },
-      (err) => {
-        console.error('Error parsing file:', err);
-        setError(err.message || 'There was an error parsing your file');
+        
+        if (rawData.length === 0) {
+          setError('No valid data found in the file. Please check the format.');
+          setIsProcessing(false);
+          return;
+        }
+        
+        // Convert the data to our required format
+        const processedData = rawData.map(row => {
+          const keys = Object.keys(row);
+          return {
+            Particulars: row[keys[0]],
+            Debit: row[keys[1]],
+            Credit: row[keys[2]]
+          };
+        });
+        
+        setProcessedData(processedData);
+        toast({
+          title: "Data Processed Successfully",
+          description: `Converted ${processedData.length} rows to the standard format.`,
+        });
+        
+        setIsProcessing(false);
+      } catch (err: any) {
+        console.error('Data processing error:', err);
+        setError(err.message || 'There was an error processing your data');
         setIsProcessing(false);
       }
-    );
+    };
+    
+    reader.onerror = () => {
+      setError('There was an error reading the file');
+      setIsProcessing(false);
+    };
+    
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   const downloadProcessedData = () => {
@@ -103,11 +176,11 @@ const DataCleanup = () => {
         </Alert>
       )}
       
-      <Card className="shadow-lg mb-8">
+      <Card className="shadow-lg mb-8 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Convert Your Financial Data</CardTitle>
+          <CardTitle>Convert Your 3-Column Data</CardTitle>
           <CardDescription>
-            Upload your financial data with three columns. We'll automatically convert it to the format required for analysis.
+            Upload any file with exactly 3 columns. We'll automatically convert it to the format required for analysis.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -127,7 +200,7 @@ const DataCleanup = () => {
       </Card>
       
       {processedData && processedData.length > 0 && (
-        <Card className="shadow-lg">
+        <Card className="shadow-lg dark:border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Processed Data</CardTitle>
@@ -141,7 +214,7 @@ const DataCleanup = () => {
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="border rounded-md overflow-hidden">
+            <div className="border rounded-md overflow-hidden dark:border-gray-700">
               <div className="max-h-80 overflow-auto">
                 <Table>
                   <TableHeader>
@@ -163,7 +236,7 @@ const DataCleanup = () => {
                 </Table>
               </div>
               {processedData.length > 10 && (
-                <div className="text-center py-2 text-sm text-muted-foreground border-t">
+                <div className="text-center py-2 text-sm text-muted-foreground border-t dark:border-gray-700">
                   Showing 10 of {processedData.length} rows
                 </div>
               )}

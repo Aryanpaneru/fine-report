@@ -6,114 +6,68 @@ import { Download, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
 
 const SampleDataGenerator = () => {
   const [generating, setGenerating] = useState(false);
   const [format, setFormat] = useState<'xlsx' | 'csv'>('xlsx');
+  const [rowCount, setRowCount] = useState(50); // Default to 50 rows
   const { toast } = useToast();
+
+  // Define a list of common account names
+  const accountNames = [
+    // Assets
+    'Cash in Hand', 'Cash at Bank', 'Sundry Debtors', 'Inventory', 'Equipment',
+    'Furniture and Fixtures', 'Computer Equipment', 'Prepaid Rent', 'Prepaid Insurance',
+    'Investments', 'Land', 'Buildings', 'Vehicles', 'Office Supplies',
+    // Liabilities
+    'Accounts Payable', 'Bank Loan', 'Bank Overdraft', 'Credit Card Payable',
+    'Sundry Creditors', 'Notes Payable', 'Interest Payable', 'Salary Payable',
+    'Taxes Payable', 'Unearned Revenue', 'Mortgage Payable',
+    // Equity
+    'Capital', 'Retained Earnings', "Owner's Drawing",
+    // Income
+    'Sales Revenue', 'Service Revenue', 'Interest Income', 'Rental Income',
+    'Commission Income', 'Discount Received', 'Miscellaneous Income', 'Royalty Income',
+    // Expenses
+    'Purchases', 'Salaries Expense', 'Rent Expense', 'Utilities Expense',
+    'Insurance Expense', 'Depreciation Expense', 'Advertising Expense',
+    'Office Supplies Expense', 'Telephone Expense', 'Internet Expense',
+    'Repair and Maintenance', 'Fuel Expense', 'Legal Fees', 'Accounting Fees',
+    'Bank Charges', 'Interest Expense', 'Bad Debts', 'Staff Training',
+    'Travel Expense', 'Entertainment Expense', 'Printing and Stationery'
+  ];
+
+  const generateRandomAmount = () => {
+    // Generate a random amount between 1000 and 50000
+    return Math.floor(Math.random() * 49000) + 1000;
+  };
+
+  const getRandomAccount = () => {
+    // Get a random account name from the list
+    return accountNames[Math.floor(Math.random() * accountNames.length)];
+  };
 
   const generateSampleData = () => {
     setGenerating(true);
     try {
-      // Create sample financial data entries with approximately 100 entries
+      // Create random financial data entries based on the selected row count
       const sampleData = [
         // Headers row
-        ['Particulars', 'Debit', 'Credit'],
-        // Assets
-        ['Cash in Hand', '15000', ''],
-        ['Cash at Bank', '85000', ''],
-        ['Sundry Debtors', '124000', ''],
-        ['Inventory', '230000', ''],
-        ['Equipment', '175000', ''],
-        ['Furniture and Fixtures', '52000', ''],
-        ['Computer and IT Equipment', '38500', ''],
-        ['Prepaid Rent', '24000', ''],
-        ['Prepaid Insurance', '12000', ''],
-        ['Investments', '150000', ''],
-        ['Land', '350000', ''],
-        ['Buildings', '650000', ''],
-        ['Vehicles', '95000', ''],
-        ['Office Supplies', '8500', ''],
-        // Liabilities
-        ['Accounts Payable', '', '95000'],
-        ['Bank Loan', '', '250000'],
-        ['Bank Overdraft', '', '15000'],
-        ['Credit Card Payable', '', '7500'],
-        ['Sundry Creditors', '', '82000'],
-        ['Notes Payable', '', '45000'],
-        ['Interest Payable', '', '12000'],
-        ['Salary Payable', '', '32000'],
-        ['Taxes Payable', '', '28500'],
-        ['Unearned Revenue', '', '18000'],
-        ['Mortgage Payable', '', '350000'],
-        // Equity
-        ['Capital', '', '500000'],
-        ['Retained Earnings', '', '247000'],
-        ["Owner's Drawing", '35000', ''],
-        // Income
-        ['Sales Revenue', '', '785000'],
-        ['Service Revenue', '', '245000'],
-        ['Interest Income', '', '12500'],
-        ['Rental Income', '', '36000'],
-        ['Commission Income', '', '28000'],
-        ['Discount Received', '', '7500'],
-        ['Miscellaneous Income', '', '15000'],
-        ['Royalty Income', '', '22000'],
-        // Expenses
-        ['Purchases', '450000', ''],
-        ['Salaries Expense', '245000', ''],
-        ['Rent Expense', '60000', ''],
-        ['Utilities Expense', '35000', ''],
-        ['Insurance Expense', '28000', ''],
-        ['Depreciation Expense', '45000', ''],
-        ['Advertising Expense', '32000', ''],
-        ['Office Supplies Expense', '18500', ''],
-        ['Telephone Expense', '12000', ''],
-        ['Internet Expense', '9600', ''],
-        ['Repair and Maintenance', '24000', ''],
-        ['Fuel Expense', '18000', ''],
-        ['Legal Fees', '15000', ''],
-        ['Accounting Fees', '12000', ''],
-        ['Bank Charges', '7500', ''],
-        ['Interest Expense', '22000', ''],
-        ['Bad Debts', '14000', ''],
-        ['Staff Training', '9500', ''],
-        ['Travel Expense', '21000', ''],
-        ['Entertainment Expense', '13500', ''],
-        ['Printing and Stationery', '8500', ''],
-        ['Postage and Courier', '4500', ''],
-        ['Cleaning Expense', '12000', ''],
-        ['Security Expense', '18000', ''],
-        ['Website Maintenance', '7200', ''],
-        ['Software Subscriptions', '15000', ''],
-        ['Professional Development', '13000', ''],
-        ['Donations', '8000', ''],
-        ['Membership Fees', '5500', ''],
-        ['Licenses and Permits', '9000', ''],
-        ['Property Taxes', '24000', ''],
-        ['Income Taxes', '45000', ''],
-        ['Medical Insurance', '32000', ''],
-        ['Retirement Contributions', '25000', ''],
-        ['Employee Benefits', '28000', ''],
-        ['Commission Expense', '35000', ''],
-        ['Freight Expense', '22000', ''],
-        ['Miscellaneous Expense', '11500', ''],
-        ['Consulting Fees', '28000', ''],
-        ['Equipment Rental', '16500', ''],
-        ['Marketing Expense', '29000', ''],
-        ['Research and Development', '45000', ''],
-        ['Uniforms', '7500', ''],
-        ['Waste Disposal', '6800', ''],
-        ['Water Expense', '5200', ''],
-        ['Contract Labor', '32000', ''],
-        ['Warranty Expense', '12000', ''],
-        ['Stock (01.01.2023)', '185000', ''],
-        ['Carriage Inwards', '25000', ''],
-        ['Carriage Outwards', '18000', ''],
-        ['Trade Expenses', '24000', ''],
-        ['Wages', '195000', ''],
-        ['Heating and Lighting', '22000', '']
+        ['Particulars', 'Debit', 'Credit']
       ];
+      
+      // Generate random data rows
+      for (let i = 0; i < rowCount; i++) {
+        const account = getRandomAccount();
+        const isDebitEntry = Math.random() > 0.5;
+        
+        if (isDebitEntry) {
+          sampleData.push([account, generateRandomAmount().toString(), '']);
+        } else {
+          sampleData.push([account, '', generateRandomAmount().toString()]);
+        }
+      }
 
       // Create a workbook
       const worksheet = XLSX.utils.aoa_to_sheet(sampleData);
@@ -144,7 +98,7 @@ const SampleDataGenerator = () => {
 
       toast({
         title: "Sample Data Generated",
-        description: `A sample trial balance ${format.toUpperCase()} file has been downloaded.`,
+        description: `A sample trial balance ${format.toUpperCase()} file with ${rowCount} rows has been downloaded.`,
       });
     } catch (error) {
       console.error('Error generating sample data:', error);
@@ -159,50 +113,71 @@ const SampleDataGenerator = () => {
   };
 
   return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <FileSpreadsheet className="mr-2 h-5 w-5" />
-          Sample Data Generator
-        </CardTitle>
-        <CardDescription>
-          Generate a sample file with approximately 100 financial data entries that match the expected format.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">
-          This will create a sample trial balance with assets, liabilities, equity, income, and expense accounts.
-          The generated file will be immediately downloaded to your device.
-        </p>
-        
-        <Tabs defaultValue="xlsx" onValueChange={(value) => setFormat(value as 'xlsx' | 'csv')} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="xlsx">Excel (.xlsx)</TabsTrigger>
-            <TabsTrigger value="csv">CSV</TabsTrigger>
-          </TabsList>
-          <TabsContent value="xlsx">
-            <p className="text-sm text-muted-foreground">
-              Generate an Excel file that can be imported into the application. This format preserves all data types.
+    <div className="container mx-auto py-6 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8 text-center">Sample Data Generator</h1>
+      
+      <Card className="shadow-lg dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <FileSpreadsheet className="mr-2 h-5 w-5" />
+            Sample Data Generator
+          </CardTitle>
+          <CardDescription>
+            Generate a randomized sample file with financial data that matches the expected format.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Number of rows: {rowCount}</h3>
+            <Slider
+              defaultValue={[rowCount]}
+              max={100}
+              min={10}
+              step={1}
+              onValueChange={(values) => setRowCount(values[0])}
+              className="mb-4"
+            />
+            <p className="text-xs text-muted-foreground">
+              Choose between 10 and 100 rows of random financial data
             </p>
-          </TabsContent>
-          <TabsContent value="csv">
-            <p className="text-sm text-muted-foreground">
-              Generate a CSV file that can be imported into the application. This is a plain text format compatible with most spreadsheet applications.
+          </div>
+          
+          <div>
+            <p className="text-sm text-muted-foreground mb-4">
+              This will create a sample trial balance with randomly generated values for various accounts.
+              The generated file will be immediately downloaded to your device.
             </p>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={generateSampleData} 
-          disabled={generating}
-          className="ml-auto"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {generating ? "Generating..." : "Generate Sample Data"}
-        </Button>
-      </CardFooter>
-    </Card>
+          </div>
+          
+          <Tabs defaultValue="xlsx" onValueChange={(value) => setFormat(value as 'xlsx' | 'csv')}>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="xlsx">Excel (.xlsx)</TabsTrigger>
+              <TabsTrigger value="csv">CSV</TabsTrigger>
+            </TabsList>
+            <TabsContent value="xlsx">
+              <p className="text-sm text-muted-foreground">
+                Generate an Excel file that can be imported into the application. This format preserves all data types.
+              </p>
+            </TabsContent>
+            <TabsContent value="csv">
+              <p className="text-sm text-muted-foreground">
+                Generate a CSV file that can be imported into the application. This is a plain text format compatible with most spreadsheet applications.
+              </p>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            onClick={generateSampleData} 
+            disabled={generating}
+            className="ml-auto"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {generating ? "Generating..." : "Generate Sample Data"}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 
