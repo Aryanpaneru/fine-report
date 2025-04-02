@@ -11,8 +11,8 @@ import 'jspdf-autotable';
 
 interface FinancialEntry {
   Particulars: string;
-  Debit: number;
-  Credit: number;
+  Debit: number | string;
+  Credit: number | string;
 }
 
 interface TrialBalance {
@@ -53,6 +53,7 @@ const Reports = () => {
     
     try {
       const parsedData = JSON.parse(data);
+      console.log('Retrieved data from localStorage:', parsedData);
       setTrialBalanceData(parsedData);
       generateReports(parsedData);
     } catch (error) {
@@ -67,6 +68,8 @@ const Reports = () => {
   }, [navigate, toast]);
 
   const generateReports = (data: FinancialEntry[]) => {
+    console.log('Generating reports with data:', data);
+    
     // Categorize data for profit and loss and balance sheet
     const incomes: any[] = [];
     const expenses: any[] = [];
@@ -93,30 +96,61 @@ const Reports = () => {
 
     // Process each entry and categorize
     data.forEach(entry => {
-      const { Particulars, Debit, Credit } = entry;
+      console.log('Processing entry:', entry);
       
-      if (incomeAccounts.includes(Particulars)) {
+      // Ensure values are numbers
+      const debit = parseFloat(entry.Debit as string) || 0;
+      const credit = parseFloat(entry.Credit as string) || 0;
+      
+      if (typeof entry.Particulars !== 'string') {
+        console.warn('Skipping entry with non-string Particulars:', entry);
+        return;
+      }
+      
+      const particulars = entry.Particulars.trim();
+      
+      if (incomeAccounts.some(account => particulars.includes(account))) {
         incomes.push({
-          name: Particulars,
-          amount: Credit || 0
+          name: particulars,
+          amount: credit || 0
         });
-      } else if (expenseAccounts.includes(Particulars)) {
+      } else if (expenseAccounts.some(account => particulars.includes(account))) {
         expenses.push({
-          name: Particulars,
-          amount: Debit || 0
+          name: particulars,
+          amount: debit || 0
         });
-      } else if (assetAccounts.includes(Particulars)) {
+      } else if (assetAccounts.some(account => particulars.includes(account))) {
         assets.push({
-          name: Particulars,
-          amount: Debit || 0
+          name: particulars,
+          amount: debit || 0
         });
-      } else if (liabilityAccounts.includes(Particulars)) {
+      } else if (liabilityAccounts.some(account => particulars.includes(account))) {
         liabilities.push({
-          name: Particulars,
-          amount: Credit || 0
+          name: particulars,
+          amount: credit || 0
         });
+      } else {
+        console.log('Uncategorized account:', particulars);
+        // Try to intelligently categorize based on debit/credit values
+        if (debit > 0 && credit === 0) {
+          assets.push({
+            name: particulars,
+            amount: debit
+          });
+        } else if (credit > 0 && debit === 0) {
+          liabilities.push({
+            name: particulars,
+            amount: credit
+          });
+        }
       }
     });
+
+    console.log('Categorized data:');
+    console.log('Incomes:', incomes);
+    console.log('Expenses:', expenses);
+    console.log('Assets:', assets);
+    console.log('Liabilities:', liabilities);
 
     // Calculate totals
     const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
