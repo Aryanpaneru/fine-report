@@ -12,6 +12,7 @@ import Dashboard from "./components/Dashboard";
 import Reports from "./components/Reports";
 import ViewReports from "./components/ViewReports";
 import Ratios from "./components/Ratios";
+import SampleDataGenerator from "./components/SampleDataGenerator";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => {
               <Route path="/reports" element={<Reports />} />
               <Route path="/view-reports" element={<ViewReports />} />
               <Route path="/ratios" element={<Ratios />} />
+              <Route path="/sample-data" element={<SampleDataGenerator />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

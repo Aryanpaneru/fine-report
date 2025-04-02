@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, PieChart } from '@/components/charts';
+import SampleDataGenerator from './SampleDataGenerator';
 
 interface ProfitLossData {
   incomes: { name: string; amount: number }[];
@@ -94,8 +95,22 @@ const ViewReports = () => {
 
   if (!profitLossData || !balanceSheetData) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
-        <p>Loading reports...</p>
+      <div className="container mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-8 text-center">Financial Report Visualizations</h1>
+        <div className="max-w-2xl mx-auto">
+          <Card className="shadow mb-8">
+            <CardHeader>
+              <CardTitle>No Reports Found</CardTitle>
+              <CardDescription>
+                You need to upload and process financial data before viewing reports.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-6">Would you like to generate sample data to test the application?</p>
+              <SampleDataGenerator />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
