@@ -13,6 +13,7 @@ import Reports from "./components/Reports";
 import ViewReports from "./components/ViewReports";
 import Ratios from "./components/Ratios";
 import SampleDataGenerator from "./components/SampleDataGenerator";
+import DataCleanup from "./components/DataCleanup";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => {
               <Route path="/view-reports" element={<ViewReports />} />
               <Route path="/ratios" element={<Ratios />} />
               <Route path="/sample-data" element={<SampleDataGenerator />} />
+              <Route path="/data-cleanup" element={<DataCleanup />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
