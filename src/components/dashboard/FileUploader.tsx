@@ -12,6 +12,19 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
+  // List of supported Excel and CSV MIME types and extensions
+  const supportedTypes = [
+    'text/csv', 
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.ms-excel', // .xls
+    'application/octet-stream', // Sometimes Excel files are reported as this
+    'application/vnd.oasis.opendocument.spreadsheet', // .ods
+    'application/csv',
+    'application/excel',
+    'application/x-excel',
+    'application/x-msexcel'
+  ];
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -38,14 +51,10 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
   };
 
   const handleFile = (file: File) => {
-    const excelTypes = [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/vnd.ms-excel', // .xls
-      'application/octet-stream', // Sometimes Excel files are reported as this
-      'application/vnd.oasis.opendocument.spreadsheet' // .ods
-    ];
+    // Check file type or extension
+    const isValidType = isValidFileType(file);
     
-    if (file.type === 'text/csv' || excelTypes.includes(file.type)) {
+    if (isValidType) {
       setFile(file);
       setFileName(file.name);
       onFileSelect(file);
@@ -55,6 +64,20 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
       setFileName('');
       // Error handling is done by the parent component
     }
+  };
+
+  const isValidFileType = (file: File): boolean => {
+    // Check by MIME type
+    if (supportedTypes.includes(file.type)) {
+      return true;
+    }
+    
+    // Check by file extension as a fallback
+    const fileName = file.name.toLowerCase();
+    return fileName.endsWith('.csv') || 
+           fileName.endsWith('.xlsx') || 
+           fileName.endsWith('.xls') || 
+           fileName.endsWith('.ods');
   };
 
   const removeFile = () => {
@@ -92,7 +115,7 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
             type="file"
             id="file-upload"
             className="hidden"
-            accept=".csv,.xlsx,.xls"
+            accept=".csv,.xlsx,.xls,.ods"
             onChange={handleFileChange}
           />
           <Button asChild variant="outline">
