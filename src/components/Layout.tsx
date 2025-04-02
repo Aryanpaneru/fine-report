@@ -23,7 +23,9 @@ import {
   BarChart, 
   LogOut, 
   Sun, 
-  Moon
+  Moon,
+  FileUp,
+  FileSearch
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -117,6 +119,39 @@ const Layout = ({ toggleTheme, isDarkMode }: LayoutProps) => {
                       >
                         <PieChart className="mr-2 h-4 w-4" />
                         <span>Key Ratios</span>
+                      </Button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>Data Tools</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Button 
+                        variant={location.pathname === '/data-cleanup' ? "secondary" : "ghost"} 
+                        className="w-full justify-start" 
+                        onClick={() => navigate('/data-cleanup')}
+                      >
+                        <FileSearch className="mr-2 h-4 w-4" />
+                        <span>Data Cleanup</span>
+                      </Button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Button 
+                        variant={location.pathname === '/sample-data' ? "secondary" : "ghost"} 
+                        className="w-full justify-start" 
+                        onClick={() => navigate('/sample-data')}
+                      >
+                        <FileUp className="mr-2 h-4 w-4" />
+                        <span>Sample Data</span>
                       </Button>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
