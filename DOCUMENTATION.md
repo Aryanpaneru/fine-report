@@ -14,23 +14,24 @@ Financial Analyzer is a web application designed to help users analyze financial
 5. [Data Requirements](#data-requirements)
 6. [Authentication](#authentication)
 7. [Troubleshooting](#troubleshooting)
+8. [Technical Implementation Details](#technical-implementation-details)
 
 ## Features
 
-- **User Authentication**: Login system to protect data privacy.
-- **File Upload**: Support for CSV and Excel files (XLSX, XLS, ODS) containing financial data.
+- **User Authentication**: Secure login system to protect user data.
+- **File Upload**: Supports CSV and Excel files (XLSX, XLS, ODS) containing financial data.
 - **Data Validation**: Comprehensive validation of uploaded financial data.
 - **Financial Reports**: 
   - Profit & Loss Statement
   - Balance Sheet
   - Financial Ratios
 - **Visualization**: Visual representation of financial data using charts.
-- **Export Functionality**: Export reports to PDF format.
+- **Export Functionality**: Reports can be exported in PDF and Word format.
 - **Dark/Light Mode**: Toggle between dark and light display themes.
 
 ## Project Structure
 
-The application is built using React, TypeScript, and various supporting libraries:
+The application is built using React, TypeScript, and various supporting libraries. The folder structure is as follows:
 
 - **src/components/**: UI components of the application
   - **dashboard/**: Components related to the dashboard page
@@ -41,6 +42,7 @@ The application is built using React, TypeScript, and various supporting librari
   - **fileParser/**: Modules for parsing uploaded files
   - **reportGenerator.ts**: Functions for generating financial reports
   - **pdfExporter.ts**: Functions for exporting reports to PDF
+  - **wordExporter.ts**: Functions for exporting reports to Word documents
 - **src/pages/**: Main page components
 - **src/hooks/**: Custom React hooks
 
@@ -62,8 +64,6 @@ Uploaded files must contain the following columns:
 
 ### Parsing Process
 
-The file parsing process consists of several steps:
-
 1. **File Format Detection**: Determines if the file is CSV or Excel format.
 2. **Raw Data Extraction**: Extracts data from the file.
 3. **Column Normalization**: Standardizes column names (case-insensitive).
@@ -82,22 +82,22 @@ This report shows the financial performance over a period, including:
 
 ### Balance Sheet
 
-This report shows the financial position, including:
+This report displays the financial position, including:
 - Assets
 - Liabilities & Equity
 - Balance verification (Total Assets = Total Liabilities + Equity)
 
 ### Financial Ratios
 
-Various financial ratios are calculated to provide insights into the financial health:
-- Liquidity ratios
-- Profitability ratios
-- Solvency ratios
-- Efficiency ratios
+Various financial ratios are calculated to provide insights into the financial health of an entity:
+- Liquidity Ratios
+- Profitability Ratios
+- Solvency Ratios
+- Efficiency Ratios
 
 ## Data Requirements
 
-For accurate financial analysis, it is recommended to upload a complete trial balance containing all accounts and their balances. 
+For accurate financial analysis, it is recommended to upload a complete trial balance containing all accounts and their balances.
 
 ### Common Account Classifications
 
@@ -137,8 +137,6 @@ If reports don't generate correctly:
 2. Check that accounts are properly categorized.
 3. Verify that all required accounts for financial analysis are present.
 
----
-
 ## Technical Implementation Details
 
 ### File Parsing Architecture
@@ -157,7 +155,7 @@ This modular design improves maintainability and allows for easier updates and e
 
 ### Report Generation Architecture
 
-The report generation process:
+The report generation process follows these steps:
 
 1. Parses the trial balance data
 2. Categorizes accounts by type (asset, liability, equity, income, expense)
@@ -166,16 +164,23 @@ The report generation process:
 5. Generates the balance sheet and profit & loss statement
 6. Calculates financial ratios
 
+### Export Functionality
+
+Reports can be exported in the following formats:
+
+1. **PDF**: Using jsPDF and jspdf-autotable libraries
+2. **Word Document**: Using docx library to create .docx files
+
 ### Data Flow
 
-1. User uploads a file through the FileUploader component
-2. The file is passed to parseFinancialFile in fileParser/index.ts
-3. Based on file type, either parseCSVFile or parseExcelFile is called
-4. Parsed data is validated using validateFinancialData
-5. Valid data is processed with processFinancialData
-6. Processed data is stored in localStorage
-7. Reports are generated using functions from reportGenerator.ts
-8. Reports can be viewed and exported to PDF using pdfExporter.ts
+1. User uploads a file through the FileUploader component.
+2. The file is passed to parseFinancialFile in fileParser/index.ts.
+3. Based on file type, either parseCSVFile or parseExcelFile is called.
+4. Parsed data is validated using validateFinancialData.
+5. Valid data is processed with processFinancialData.
+6. Processed data is stored in localStorage.
+7. Reports are generated using functions from reportGenerator.ts.
+8. Reports can be viewed and exported to PDF or Word format.
 
 ---
 

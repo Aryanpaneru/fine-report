@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, FilePdf, FileWord } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 import { exportProfitLossToPdf, exportBalanceSheetToPdf } from '@/utils/pdfExporter';
 import { exportProfitLossToWord, exportBalanceSheetToWord } from '@/utils/wordExporter';
 import { ProfitLossData, BalanceSheetData } from '@/utils/reportGenerator';
@@ -31,11 +31,11 @@ const ExportButtons = ({ type, data }: ExportButtonsProps) => {
   return (
     <div className="flex space-x-2 mt-4">
       <Button variant="outline" size="sm" onClick={handlePdfExport}>
-        <FilePdf className="h-4 w-4 mr-2" />
+        <Download className="h-4 w-4 mr-2" />
         Export as PDF
       </Button>
       <Button variant="outline" size="sm" onClick={handleWordExport}>
-        <FileWord className="h-4 w-4 mr-2" />
+        <FileText className="h-4 w-4 mr-2" />
         Export as Word
       </Button>
     </div>
